@@ -12,11 +12,22 @@
       "dest": "/static/$1"
     },
     {
+      "src": "/health",
+      "dest": "/wsgi.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/wsgi.py"
     }
   ],
   "env": {
-    "NVIDIA_API_KEY": "@nvidia_api_key"
+    "NVIDIA_API_KEY": "@nvidia_api_key",
+    "SECRET_KEY": "@secret_key",
+    "DATABASE_URL": "@database_url"
+  },
+  "functions": {
+    "wsgi.py": {
+      "maxDuration": 30
+    }
   }
 }

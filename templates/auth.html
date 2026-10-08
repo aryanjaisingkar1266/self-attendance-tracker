@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'signup' %}Sign Up{% else %}Log In{% endif %}{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-sm mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-800">{% if mode == 'signup' %}Create Account{% else %}Welcome Back{% endif %}</h2>
+            <p class="text-gray-500 mt-1">{% if mode == 'signup' %}Start tracking your attendance{% else %}Sign in to continue{% endif %}</p>
+        </div>
+        
+        <form method="POST" class="space-y-4">
+            {{ csrf_token() }}
+            
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="email" 
+                       class="auth-input" placeholder="you@example.com" value="{{ request.form.email if request.method == 'POST' else '' }}">
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password" 
+                       class="auth-input" placeholder="••••••••" minlength="8">
+            </div>
+            
+            {% if mode == 'signup' %}
+            <div>
+                <label for="confirm" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" required autocomplete="new-password" 
+                       class="auth-input" placeholder="••••••••" minlength="8">
+            </div>
+            {% endif %}
+            
+            {% if mode == 'login' %}
+            <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <input type="checkbox" name="remember" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    Remember me
+                </label>
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="auth-btn {% if mode == 'signup' %}bg-blue-600 text-white{% else %}bg-blue-600 text-white{% endif %} hover:opacity-90">
+                {% if mode == 'signup' %}Create Account{% else %}Log In{% endif %}
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center text-sm text-gray-600">
+            {% if mode == 'signup' %}
+                Already have an account? <a href="{{ url_for('login') }}" class="text-blue-600 hover:underline font-medium">Log in</a>
+            {% else %}
+                Need an account? <a href="{{ url_for('signup') }}" class="text-blue-600 hover:underline font-medium">Sign up</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,3 +16,6 @@ env/
 .vercel
 *.log
 .DS_Store
+*.egg-info/
+dist/
+build/

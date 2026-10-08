@@ -16,9 +16,12 @@
             input, button, select, textarea { font-size: 16px !important; }
         }
         .touch-target { min-height: 48px; min-width: 48px; }
+        .auth-input { @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target; }
+        .auth-btn { @apply w-full py-3 rounded-lg font-medium touch-target transition-colors; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    {% if current_user.is_authenticated %}
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-semibold text-gray-800">Attendance</h1>
@@ -28,13 +31,25 @@
                 <a href="{{ url_for('analytics') }}" class="flex-1 px-3 py-2 text-sm rounded-lg text-center touch-target {% if request.endpoint == 'analytics' %}bg-blue-600 text-white{% else %}text-gray-600{% endif %}">Analytics</a>
             </div>
         </div>
+        
+        <div class="max-w-md mx-auto px-4 pb-3 flex justify-between items-center border-t border-gray-100">
+            <span class="text-sm text-gray-500 truncate pr-2">{{ current_user.email }}</span>
+            <form action="{{ url_for('logout') }}" method="POST">
+                <button type="submit" class="text-sm text-gray-600 hover:text-gray-900 font-medium touch-target px-3 py-1">Logout</button>
+            </form>
+        </div>
     </nav>
+    {% endif %}
     
-    <main class="max-w-md mx-auto px-4 py-6 pb-24">
-        {% with messages = get_flashed_messages() %}
+    <main class="max-w-md mx-auto px-4 py-6 {% if current_user.is_authenticated %}pb-24{% else %}flex items-center justify-center min-h-[70vh]{% endif %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="mb-4 p-3 bg-green-100 text-green-800 rounded text-sm">
-                    {% for m in messages %}{{ m }}{% endfor %}
+                <div class="mb-4 space-y-2">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-lg text-sm {% if category == 'error' %}bg-red-100 text-red-800{% elif category == 'success' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}

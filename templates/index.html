@@ -34,10 +34,12 @@
                     </div>
                 {% elif can_mark %}
                     <form action="{{ url_for('mark', timetable_id=c.id, status='present') }}" method="POST" enctype="multipart/form-data" class="space-y-2">
+                        {{ csrf_token() }}
                         <input type="file" name="photo" accept="image/*" capture="environment" required class="w-full text-sm touch-target px-3 py-2 border border-gray-300 rounded-lg">
                         <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-medium touch-target">Mark Present</button>
                     </form>
                     <form action="{{ url_for('mark', timetable_id=c.id, status='absent') }}" method="POST" class="mt-2">
+                        {{ csrf_token() }}
                         <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-medium touch-target">Mark Absent</button>
                     </form>
                 {% elif not is_past %}
