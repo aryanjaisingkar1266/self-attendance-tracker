@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Weekly Timetable{% endblock %}
+
+{% block content %}
+<h2 class="text-lg font-medium text-gray-700 mb-4">Weekly Timetable</h2>
+
+<div class="space-y-4">
+    {% for d in days %}
+        {% set classes = timetable[d] %}
+        {% if classes %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="bg-gray-50 px-4 py-2 border-b border-gray-100">
+                <h3 class="font-medium text-gray-700">{{ d }}</h3>
+            </div>
+            <div class="divide-y divide-gray-100">
+                {% for c in classes %}
+                <div class="px-4 py-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium text-gray-800">{{ c.subject_name }}</p>
+                        <p class="text-sm text-gray-500">{{ c.start_time.strftime('%H:%M') }} - {{ c.end_time.strftime('%H:%M') }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% set total = timetable.values() | map('length') | sum %}
+{% if total == 0 %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
+    No timetable saved yet
+    <a href="{{ url_for('upload') }}" class="block mt-2 text-blue-600 hover:underline">Upload one</a>
+</div>
+{% endif %}
+{% endblock %}

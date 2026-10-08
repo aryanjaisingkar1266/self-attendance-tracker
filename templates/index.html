@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Today's Classes{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex justify-between items-center">
+    <h2 class="text-lg font-medium text-gray-700">{{ today.strftime('%A, %B %d') }}</h2>
+    <span class="text-sm text-gray-500">{{ now.strftime('%H:%M') }}</span>
+</div>
+
+{% if classes %}
+    <div class="space-y-3">
+        {% for c in classes %}
+            {% set a = attended.get(c.id) %}
+            {% set is_past = c.end_time < now %}
+            {% set is_current = c.start_time <= now < c.end_time %}
+            {% set can_mark = not a and (is_current or is_past) %}
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 {% if is_current %}ring-2 ring-blue-500{% endif %}">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-medium text-gray-800">{{ c.subject_name }}</h3>
+                    <span class="text-xs px-2 py-1 rounded-full {% if is_current %}bg-blue-100 text-blue-700{% elif is_past %}bg-gray-100 text-gray-500{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ c.start_time.strftime('%H:%M') }} - {{ c.end_time.strftime('%H:%M') }}
+                    </span>
+                </div>
+                
+                {% if a %}
+                    <div class="flex items-center gap-3 text-sm">
+                        <span class="px-3 py-1 rounded-full {% if a.status == 'present' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} font-medium">
+                            {{ a.status.capitalize() }}
+                        </span>
+                        {% if a.photo_path %}
+                            <a href="{{ url_for('static', filename='uploads/' ~ a.photo_path.split('/')[-1]) }}" target="_blank" class="text-blue-600 hover:underline text-xs">View Photo</a>
+                        {% endif %}
+                    </div>
+                {% elif can_mark %}
+                    <form action="{{ url_for('mark', timetable_id=c.id, status='present') }}" method="POST" enctype="multipart/form-data" class="space-y-2">
+                        <input type="file" name="photo" accept="image/*" capture="environment" required class="w-full text-sm touch-target px-3 py-2 border border-gray-300 rounded-lg">
+                        <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-medium touch-target">Mark Present</button>
+                    </form>
+                    <form action="{{ url_for('mark', timetable_id=c.id, status='absent') }}" method="POST" class="mt-2">
+                        <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-medium touch-target">Mark Absent</button>
+                    </form>
+                {% elif not is_past %}
+                    <p class="text-xs text-gray-500">Starts in {{ ((c.start_time.hour * 60 + c.start_time.minute) - (now.hour * 60 + now.minute)) }} min</p>
+                {% else %}
+                    <p class="text-xs text-gray-500">Missed - not marked</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-12 text-gray-500">
+        <p class="mb-2">No classes scheduled today</p>
+        <a href="{{ url_for('upload') }}" class="text-blue-600 underline text-sm">Add timetable</a>
+    </div>
+{% endif %}
+{% endblock %}
